@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gol.Application", "Gol.Application\Gol.Application.csproj", "{D59DAD1E-C7ED-4442-86A8-46B6332B8948}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gol.Core", "Gol.Core\Gol.Core.csproj", "{CF7985CD-BE70-4961-960A-674BBA8088F1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D59DAD1E-C7ED-4442-86A8-46B6332B8948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D59DAD1E-C7ED-4442-86A8-46B6332B8948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D59DAD1E-C7ED-4442-86A8-46B6332B8948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D59DAD1E-C7ED-4442-86A8-46B6332B8948}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF7985CD-BE70-4961-960A-674BBA8088F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF7985CD-BE70-4961-960A-674BBA8088F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF7985CD-BE70-4961-960A-674BBA8088F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF7985CD-BE70-4961-960A-674BBA8088F1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
