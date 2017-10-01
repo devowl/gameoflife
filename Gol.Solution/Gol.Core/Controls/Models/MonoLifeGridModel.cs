@@ -37,7 +37,18 @@ namespace Gol.Core.Controls.Models
         /// </summary>
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
-        /// <returns></returns>
-        public bool this[int x, int y] => _sourceArray[x, y];
+        /// <returns>Is black point.</returns>
+        public bool this[int x, int y]
+        {
+            get
+            {
+                return _sourceArray[x, y];
+            }
+
+            set
+            {
+                _sourceArray[x, y] = value;
+            }
+        }
     }
 }
