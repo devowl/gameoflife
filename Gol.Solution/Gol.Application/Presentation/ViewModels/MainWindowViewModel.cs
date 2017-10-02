@@ -15,11 +15,11 @@ namespace Gol.Application.Presentation.ViewModels
         {
             var map = new [,]
             {
-                { true, false },
-                { false, true },
-                { true, false },
-                { true, false },
-                { true, false },
+                { true, false, true, false },
+                { false, true, true, false },
+                { true, false, true, false },
+                { true, false, true, false },
+                { true, false, true, false },
             };
 
             MonoGrid = new MonoLifeGridModel(map);    

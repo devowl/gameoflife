@@ -15,6 +15,8 @@ namespace Gol.Core.Controls.Views
     /// </summary>
     public class MonoLifeView : StackPanel
     {
+        private CellData[,] _cellGrid = new CellData[0, 0];
+
         /// <summary>
         /// Dependency property for <see cref="IsReadOnly"/> property.
         /// </summary>
@@ -74,26 +76,6 @@ namespace Gol.Core.Controls.Views
         {
             CanvasRef = new Canvas();
             Children.Add(CanvasRef);
-        }
-
-        /// <inheritdoc/>
-        protected override void OnMouseUp(MouseButtonEventArgs args)
-        {
-            base.OnMouseUp(args);
-
-            if (!IsReadOnly && args.LeftButton == MouseButtonState.Released)
-            {
-                var position = args.GetPosition(this);
-                int x = (int)(position.X / CellSize),
-                    y = (int)(position.Y / CellSize);
-
-                if (0 <= x && x < MonoLifeGridModel.Width &&
-                    0 <= y && y < MonoLifeGridModel.Height)
-                {
-                    MonoLifeGridModel[x, y] = true;
-                    // TODO Draw point
-                }
-            }
         }
 
         /// <summary>
@@ -163,6 +145,32 @@ namespace Gol.Core.Controls.Views
 
         private Canvas CanvasRef { get; set; }
 
+        /// <inheritdoc/>
+        protected override void OnMouseUp(MouseButtonEventArgs args)
+        {
+            base.OnMouseUp(args);
+
+            if (!IsReadOnly && args.LeftButton == MouseButtonState.Released)
+            {
+                var position = args.GetPosition(this);
+                int x = (int)(position.X / CellSize), y = (int)(position.Y / CellSize);
+
+                if (0 <= x && x < MonoLifeGridModel.Width && 0 <= y && y < MonoLifeGridModel.Height)
+                {
+                    var value = !MonoLifeGridModel[x, y];
+                    MonoLifeGridModel[x, y] = value;
+                    if (value)
+                    {
+                        DrawSquare(x, y);
+                    }
+                    else
+                    {
+                        _cellGrid[x, y].ClearRectangle();
+                    }
+                }
+            }
+        }
+
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void MonoLifeGridModelChanged()
         {
@@ -170,7 +178,7 @@ namespace Gol.Core.Controls.Views
             {
                 return;
             }
-
+            
             if (Dispatcher.CheckAccess())
             {
                 GridRender();
@@ -180,7 +188,7 @@ namespace Gol.Core.Controls.Views
                 Dispatcher.Invoke(new Action(GridRender));
             }
         }
-
+        
         private void GridRender()
         {
             CanvasRef.Children.Clear();
@@ -191,12 +199,31 @@ namespace Gol.Core.Controls.Views
 
             SquareGrid();
 
+            _cellGrid = new CellData[MonoLifeGridModel.Width, MonoLifeGridModel.Height];
+
             for (int i = 0; i < MonoLifeGridModel.Height; i++)
             {
                 for (int j = 0; j < MonoLifeGridModel.Width; j++)
                 {
+                    _cellGrid[j, i] = new CellData(j, i, CanvasRef);
+
+                    if (MonoLifeGridModel[j, i])
+                    {
+                        DrawSquare(j, i);
+                    }
                 }
             }
+        }
+
+        private void DrawSquare(int x, int y)
+        {
+            var square = new Rectangle() { Fill = LineBrush, Width = CellSize, Height = CellSize };
+
+            CanvasRef.Children.Add(square);
+            Canvas.SetLeft(square, x * CellSize);
+            Canvas.SetTop(square, y * CellSize);
+
+            _cellGrid[x, y].SetRectangle(square);
         }
 
         private void SquareGrid()
@@ -217,6 +244,61 @@ namespace Gol.Core.Controls.Views
         private Line CreateLine(int x1, int y1, int x2, int y2)
         {
             return new Line { X1 = x1, X2 = x2, Y1 = y1, Y2 = y2, StrokeThickness = 1, Stroke = LineBrush };
+        }
+
+        private class CellData
+        {
+            private readonly Canvas _canvas;
+
+            /// <summary>
+            /// Constructor for <see cref="CellData"/>.
+            /// </summary>
+            public CellData(int x, int y, Canvas canvas)
+            {
+                _canvas = canvas;
+                X = x;
+                Y = y;
+            }
+
+            /// <summary>
+            /// X value.
+            /// </summary>
+            public int X { get; private set; }
+
+            /// <summary>
+            /// Y value.
+            /// </summary>
+            public int Y { get; private set; }
+
+            /// <summary>
+            /// Cell rectangle reference.
+            /// </summary>
+            public Rectangle Rectangle { get; private set; }
+
+            /// <summary>
+            /// Set rectangle value.
+            /// </summary>
+            /// <param name="rectangle"><see cref="Rectangle"/> instance.</param>
+            public void SetRectangle(Rectangle rectangle)
+            {
+                if (Rectangle != null)
+                {
+                    _canvas.Children.Remove(Rectangle);
+                }
+
+                Rectangle = rectangle;
+            }
+
+            /// <summary>
+            /// Clear saved rectangle.
+            /// </summary>
+            public void ClearRectangle()
+            {
+                if (Rectangle != null)
+                {
+                    _canvas.Children.Remove(Rectangle);
+                }
+            }
         }
     }
 }
