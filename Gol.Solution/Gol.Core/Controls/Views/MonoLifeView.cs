@@ -33,9 +33,9 @@ namespace Gol.Core.Controls.Views
         public static readonly DependencyProperty CellSizeProperty;
 
         /// <summary>
-        /// Dependency property for <see cref="MonoLifeGridModel"/> property.
+        /// Dependency property for <see cref="MonoLifeGrid"/> property.
         /// </summary>
-        public static readonly DependencyProperty MonoLifeGridModelProperty;
+        public static readonly DependencyProperty MonoLifeGridProperty;
 
         /// <summary>
         /// Static constructor for <see cref="MonoLifeView"/>.
@@ -60,12 +60,12 @@ namespace Gol.Core.Controls.Views
                 typeof(MonoLifeView),
                 new PropertyMetadata(10));
 
-            MonoLifeGridModelProperty = DependencyProperty.Register(
-                nameof(MonoLifeGridModel),
-                typeof(MonoLifeGridModel),
+            MonoLifeGridProperty = DependencyProperty.Register(
+                nameof(MonoLifeGrid),
+                typeof(MonoLifeGrid<bool>),
                 typeof(MonoLifeView),
                 new PropertyMetadata(
-                    default(MonoLifeGridModel),
+                    default(MonoLifeGrid<bool>),
                     (source, args) => ((MonoLifeView)source).MonoLifeGridModelChanged()));
         }
 
@@ -130,35 +130,35 @@ namespace Gol.Core.Controls.Views
         /// <summary>
         /// Mono grid model.
         /// </summary>
-        public MonoLifeGridModel MonoLifeGridModel
+        public MonoLifeGrid<bool> MonoLifeGrid
         {
             get
             {
-                return (MonoLifeGridModel)GetValue(MonoLifeGridModelProperty);
+                return (MonoLifeGrid<bool>)GetValue(MonoLifeGridProperty);
             }
 
             set
             {
-                SetValue(MonoLifeGridModelProperty, value);
+                SetValue(MonoLifeGridProperty, value);
             }
         }
 
-        private Canvas CanvasRef { get; set; }
+        private Canvas CanvasRef { get; }
 
         /// <inheritdoc/>
         protected override void OnMouseUp(MouseButtonEventArgs args)
         {
             base.OnMouseUp(args);
-
+            
             if (!IsReadOnly && args.LeftButton == MouseButtonState.Released)
             {
                 var position = args.GetPosition(this);
                 int x = (int)(position.X / CellSize), y = (int)(position.Y / CellSize);
 
-                if (0 <= x && x < MonoLifeGridModel.Width && 0 <= y && y < MonoLifeGridModel.Height)
+                if (0 <= x && x < MonoLifeGrid.Width && 0 <= y && y < MonoLifeGrid.Height)
                 {
-                    var value = !MonoLifeGridModel[x, y];
-                    MonoLifeGridModel[x, y] = value;
+                    var value = !MonoLifeGrid[x, y];
+                    MonoLifeGrid[x, y] = value;
                     if (value)
                     {
                         DrawSquare(x, y);
@@ -192,22 +192,22 @@ namespace Gol.Core.Controls.Views
         private void GridRender()
         {
             CanvasRef.Children.Clear();
-            if (MonoLifeGridModel.Height == 0 || MonoLifeGridModel.Width == 0)
+            if (MonoLifeGrid.Height == 0 || MonoLifeGrid.Width == 0)
             {
                 return;
             }
 
             SquareGrid();
 
-            _cellGrid = new CellData[MonoLifeGridModel.Width, MonoLifeGridModel.Height];
+            _cellGrid = new CellData[MonoLifeGrid.Width, MonoLifeGrid.Height];
 
-            for (int i = 0; i < MonoLifeGridModel.Height; i++)
+            for (int i = 0; i < MonoLifeGrid.Height; i++)
             {
-                for (int j = 0; j < MonoLifeGridModel.Width; j++)
+                for (int j = 0; j < MonoLifeGrid.Width; j++)
                 {
                     _cellGrid[j, i] = new CellData(j, i, CanvasRef);
 
-                    if (MonoLifeGridModel[j, i])
+                    if (MonoLifeGrid[j, i])
                     {
                         DrawSquare(j, i);
                     }
@@ -229,15 +229,15 @@ namespace Gol.Core.Controls.Views
         private void SquareGrid()
         {
             // Rows
-            for (int i = 0; i <= MonoLifeGridModel.Height; i++)
+            for (int i = 0; i <= MonoLifeGrid.Height; i++)
             {
-                CanvasRef.Children.Add(CreateLine(0, i * CellSize, MonoLifeGridModel.Width * CellSize, i * CellSize));
+                CanvasRef.Children.Add(CreateLine(0, i * CellSize, MonoLifeGrid.Width * CellSize, i * CellSize));
             }
 
             // Columns
-            for (int j = 0; j <= MonoLifeGridModel.Width; j++)
+            for (int j = 0; j <= MonoLifeGrid.Width; j++)
             {
-                CanvasRef.Children.Add(CreateLine(j * CellSize, 0, j * CellSize, MonoLifeGridModel.Height * CellSize));
+                CanvasRef.Children.Add(CreateLine(j * CellSize, 0, j * CellSize, MonoLifeGrid.Height * CellSize));
             }
         }
 

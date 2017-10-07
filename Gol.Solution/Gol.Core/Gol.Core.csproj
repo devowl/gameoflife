@@ -43,7 +43,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\Models\MonoLifeGridModel.cs" />
+    <Compile Include="Algorithm\DoubleStateLife.cs" />
+    <Compile Include="Controls\Models\MonoLifeGrid.cs" />
     <Compile Include="Controls\Views\MonoLifeView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

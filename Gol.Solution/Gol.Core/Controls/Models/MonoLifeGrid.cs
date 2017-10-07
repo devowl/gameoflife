@@ -5,21 +5,21 @@ namespace Gol.Core.Controls.Models
     /// <summary>
     /// Mono life grid model.
     /// </summary>
-    public class MonoLifeGridModel
+    public class MonoLifeGrid<TValue>
     {
-        private readonly bool[,] _sourceArray;
+        private readonly TValue[,] _sourceArray;
 
         /// <summary>
-        /// Constructor for <see cref="MonoLifeGridModel"/>.
+        /// Constructor for <see cref="MonoLifeGrid{TValue}"/>.
         /// </summary>
-        public MonoLifeGridModel(bool[,] sourceArray)
+        public MonoLifeGrid(TValue[,] sourceArray)
         {
             if (sourceArray == null)
             {
                 throw new ArgumentNullException(nameof(sourceArray));
             }
 
-            _sourceArray = (bool[,])sourceArray.Clone();
+            _sourceArray = (TValue[,])sourceArray.Clone();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Gol.Core.Controls.Models
         /// <param name="x">X coordinate.</param>
         /// <param name="y">Y coordinate.</param>
         /// <returns>Is black point.</returns>
-        public bool this[int x, int y]
+        public TValue this[int x, int y]
         {
             get
             {

@@ -22,12 +22,12 @@ namespace Gol.Application.Presentation.ViewModels
                 { true, false, true, false },
             };
 
-            MonoGrid = new MonoLifeGridModel(map);    
+            MonoGrid = new MonoLifeGrid(map);    
         }
 
         /// <summary>
         /// Map for mono grid.
         /// </summary>
-        public MonoLifeGridModel MonoGrid { get; private set; }
+        public MonoLifeGrid MonoGrid { get; private set; }
     }
 }
