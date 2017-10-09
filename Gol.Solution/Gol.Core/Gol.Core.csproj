@@ -46,6 +46,10 @@
     <Compile Include="Algorithm\DoubleStateLife.cs" />
     <Compile Include="Controls\Models\MonoLifeGrid.cs" />
     <Compile Include="Controls\Views\MonoLifeView.cs" />
+    <Compile Include="Data\ILifeControl.cs" />
+    <Compile Include="Prism\DelegateCommand.cs" />
+    <Compile Include="Prism\NotificationObject.cs" />
+    <Compile Include="Prism\PropertySupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

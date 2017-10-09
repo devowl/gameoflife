@@ -50,5 +50,15 @@ namespace Gol.Core.Controls.Models
                 _sourceArray[x, y] = value;
             }
         }
+
+        /// <summary>
+        /// Create array copy.
+        /// </summary>
+        /// <returns></returns>
+        public MonoLifeGrid<TValue> Clone()
+        {
+            var array = (TValue[,])_sourceArray.Clone();
+            return new MonoLifeGrid<TValue>(array);
+        }
     }
 }

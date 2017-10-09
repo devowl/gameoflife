@@ -38,10 +38,37 @@ namespace Gol.Core.Controls.Views
         public static readonly DependencyProperty MonoLifeGridProperty;
 
         /// <summary>
+        /// Dependency property for <see cref="CellBrush"/> property.
+        /// </summary>
+        public static readonly DependencyProperty CellBrushProperty;
+
+        /// <summary>
+        /// Cell brush color.
+        /// </summary>
+        public Brush CellBrush
+        {
+            get
+            {
+                return (Brush)GetValue(CellBrushProperty);
+            }
+
+            set
+            {
+                SetValue(CellBrushProperty, value);
+            }
+        }
+
+        /// <summary>
         /// Static constructor for <see cref="MonoLifeView"/>.
         /// </summary>
         static MonoLifeView()
         {
+            CellBrushProperty = DependencyProperty.Register(
+                nameof(CellBrush),
+                typeof(Brush),
+                typeof(MonoLifeView),
+                new PropertyMetadata(Brushes.GreenYellow));
+
             IsReadOnlyProperty = DependencyProperty.Register(
                 nameof(IsReadOnly),
                 typeof(bool),
@@ -170,8 +197,7 @@ namespace Gol.Core.Controls.Views
                 }
             }
         }
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        
         private void MonoLifeGridModelChanged()
         {
             if (CanvasRef == null)
@@ -192,7 +218,7 @@ namespace Gol.Core.Controls.Views
         private void GridRender()
         {
             CanvasRef.Children.Clear();
-            if (MonoLifeGrid.Height == 0 || MonoLifeGrid.Width == 0)
+            if (MonoLifeGrid == null || MonoLifeGrid.Height == 0 || MonoLifeGrid.Width == 0)
             {
                 return;
             }
@@ -217,7 +243,7 @@ namespace Gol.Core.Controls.Views
 
         private void DrawSquare(int x, int y)
         {
-            var square = new Rectangle() { Fill = LineBrush, Width = CellSize, Height = CellSize };
+            var square = new Rectangle() { Fill = CellBrush, Width = CellSize, Height = CellSize };
 
             CanvasRef.Children.Add(square);
             Canvas.SetLeft(square, x * CellSize);

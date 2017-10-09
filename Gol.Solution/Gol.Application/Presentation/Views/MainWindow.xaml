@@ -9,7 +9,23 @@
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Border BorderThickness="2" BorderBrush="Green" Width="300" Height="300">
-        <views:MonoLifeView MonoLifeGrid="{Binding MonoGrid}" Background="Black" />
-    </Border>
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="MinWidth" Value="100" />
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <views:MonoLifeView MonoLifeGrid="{Binding DoubleStateLife.Current, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Background="Black" />
+        </ScrollViewer>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal">
+            <Button Command="{Binding StartCommand}" Content="Start"/>
+            <Button Command="{Binding StopCommand}" Content="Stop"/>
+        </StackPanel>
+    </Grid>
 </Window>
