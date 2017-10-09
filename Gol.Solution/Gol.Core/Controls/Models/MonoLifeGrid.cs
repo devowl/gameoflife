@@ -12,6 +12,15 @@ namespace Gol.Core.Controls.Models
         /// <summary>
         /// Constructor for <see cref="MonoLifeGrid{TValue}"/>.
         /// </summary>
+        public MonoLifeGrid(TValue[,] sourceArray, Guid lifeId)
+            : this(sourceArray)
+        {
+            LifeId = lifeId;
+        }
+
+        /// <summary>
+        /// Constructor for <see cref="MonoLifeGrid{TValue}"/>.
+        /// </summary>
         public MonoLifeGrid(TValue[,] sourceArray)
         {
             if (sourceArray == null)
@@ -20,7 +29,13 @@ namespace Gol.Core.Controls.Models
             }
 
             _sourceArray = (TValue[,])sourceArray.Clone();
+            LifeId = Guid.NewGuid();
         }
+
+        /// <summary>
+        /// Life field identity.
+        /// </summary>
+        public Guid LifeId { get; private set; }
 
         /// <summary>
         /// Grid width.
@@ -58,7 +73,7 @@ namespace Gol.Core.Controls.Models
         public MonoLifeGrid<TValue> Clone()
         {
             var array = (TValue[,])_sourceArray.Clone();
-            return new MonoLifeGrid<TValue>(array);
+            return new MonoLifeGrid<TValue>(array) { LifeId = LifeId };
         }
     }
 }

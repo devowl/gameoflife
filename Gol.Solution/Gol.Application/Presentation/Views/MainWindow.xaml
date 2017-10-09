@@ -3,12 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Gol.Application"
         xmlns:views="clr-namespace:Gol.Core.Controls.Views;assembly=Gol.Core"
         xmlns:viewModels="clr-namespace:Gol.Application.Presentation.ViewModels"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:behaviors="clr-namespace:Gol.Application.Presentation.Behaviors"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Game of life. Author: Sergey Vaulin. Site: www.devowl.net" Height="350" Width="525">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="5" />
@@ -20,12 +21,19 @@
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
             <views:MonoLifeView MonoLifeGrid="{Binding DoubleStateLife.Current, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Background="Black" />
+            <i:Interaction.Behaviors>
+                <behaviors:GridScrollViewerBehavior/>
+            </i:Interaction.Behaviors>
         </ScrollViewer>
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal">
             <Button Command="{Binding StartCommand}" Content="Start"/>
             <Button Command="{Binding StopCommand}" Content="Stop"/>
+            <TextBlock>
+                Generation:
+                <Run Text="{Binding DoubleStateLife.GernerationNumber, FallbackValue=0}" />
+            </TextBlock>
         </StackPanel>
     </Grid>
 </Window>

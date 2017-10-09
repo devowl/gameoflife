@@ -16,11 +16,9 @@ namespace Gol.Application.Presentation.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
-            DoubleStateLife = new DoubleStateLife();
+            DoubleStateLife = new DoubleStateLife(new MonoLifeGrid<bool>(new bool[250, 200]));
             StartCommand = new DelegateCommand(Start);
             StopCommand = new DelegateCommand(Stop);
-            DoubleStateLife.SetCurrent(new MonoLifeGrid<bool>(new bool[25, 20]));
-            DoubleStateLife.PropertyChanged += (sender, args) => RaisePropertyChanged(nameof(DoubleStateLife));
         }
 
         private void Stop(object obj)

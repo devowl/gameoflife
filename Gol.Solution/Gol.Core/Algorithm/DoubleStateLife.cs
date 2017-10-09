@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 using Gol.Core.Controls.Models;
@@ -14,13 +15,9 @@ namespace Gol.Core.Algorithm
     /// </summary>
     public class DoubleStateLife : NotificationObject, ILifeControl<bool>
     {
-        private readonly object _syncObject = new object();
+        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(10);
 
-        private readonly Thread _lifeTimer;
-
-        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(100);
-
-        private bool IsAlive = false;
+        private Timer _updateTimer;
 
         //    -1   0   1
         // -1 [ ] [ ] [ ]
@@ -47,6 +44,8 @@ namespace Gol.Core.Algorithm
 
         private MonoLifeGrid<bool> _previous;
 
+        private int _gernerationNumber;
+
         /// <summary>
         /// Constructor for <see cref="DoubleStateLife"/>.
         /// </summary>
@@ -61,21 +60,6 @@ namespace Gol.Core.Algorithm
         /// </summary>
         public DoubleStateLife()
         {
-            _lifeTimer = new Thread(TimerElapsed);
-            _lifeTimer.Start();
-        }
-
-        private void TimerElapsed()
-        {
-            while (true)
-            {
-                if (IsAlive)
-                {
-                    LifeStep();
-                }
-
-                Thread.Sleep(_realtimeDelay);
-            }
         }
 
         /// <inheritdoc/>
@@ -108,6 +92,23 @@ namespace Gol.Core.Algorithm
             }
         }
 
+        /// <summary>
+        /// Generation number.
+        /// </summary>
+        public int GernerationNumber
+        {
+            get
+            {
+                return _gernerationNumber;
+            }
+
+            set
+            {
+                _gernerationNumber = value;
+                RaisePropertyChanged(nameof(GernerationNumber));
+            }
+        }
+
         /// <inheritdoc/>
         public void SetCurrent(MonoLifeGrid<bool> grid)
         {
@@ -117,25 +118,37 @@ namespace Gol.Core.Algorithm
             }
             else
             {
+                GernerationNumber = 0;
                 Current = grid;
             }
         }
 
         /// <inheritdoc/>
-        public bool Start()
+        public void Start()
         {
             if (Current == null || Current.Height == 0 || Current.Width == 0)
             {
-                return false;
+                return;
             }
-                
-            return IsAlive = true;
+
+            if (_updateTimer != null)
+            {
+                Stop();
+            }
+
+            _updateTimer = new Timer(TimerElapsed, null, TimeSpan.FromSeconds(0), _realtimeDelay);
         }
 
         /// <inheritdoc/>
         public void Stop()
         {
-            IsAlive = false;
+            _updateTimer.Dispose();
+        }
+
+        private void TimerElapsed(object obj)
+        {
+            LifeStep();
+            Thread.Sleep(_realtimeDelay);
         }
 
         private int NearCells(int x, int y, MonoLifeGrid<bool> field)
@@ -153,6 +166,7 @@ namespace Gol.Core.Algorithm
             return 0;
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void LifeStep()
         {
             /*
@@ -161,8 +175,8 @@ namespace Gol.Core.Algorithm
             * Существо с двумя или тремя соседями выживает в следующем поколении, иначе погибает от одиночества или перенаселённости.
             * В пустой клетке с тремя соседями в следующем поколении рождается существо.
             */
-            
-            Previous = _current.Clone();
+            Previous = _current;
+            Current = _current.Clone();
             for (int i = 0; i < _current.Width; i ++)
             {
                 for (int j = 0; j < _current.Height; j ++)
@@ -183,7 +197,8 @@ namespace Gol.Core.Algorithm
 
                 }
             }
-            
+
+            GernerationNumber++;
             RaisePropertyChanged(nameof(Current));
             RaisePropertyChanged(nameof(Previous));
         }

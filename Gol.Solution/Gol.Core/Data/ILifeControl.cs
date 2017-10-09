@@ -26,7 +26,7 @@ namespace Gol.Core.Data
         /// <summary>
         /// Start\Resume life cycle.
         /// </summary>
-        bool Start();
+        void Start();
 
         /// <summary>
         /// Stop life.
