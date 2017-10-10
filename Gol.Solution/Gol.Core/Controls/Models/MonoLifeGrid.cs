@@ -1,35 +1,53 @@
 ﻿using System;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
+
+using Gol.Core.Data;
 
 namespace Gol.Core.Controls.Models
 {
     /// <summary>
     /// Mono life grid model.
     /// </summary>
+    [DataContract]
     public class MonoLifeGrid<TValue>
     {
-        private readonly TValue[,] _sourceArray;
+        [DataMember]
+        private TValue[][] _sourceArray;
 
         /// <summary>
         /// Constructor for <see cref="MonoLifeGrid{TValue}"/>.
         /// </summary>
-        public MonoLifeGrid(TValue[,] sourceArray, Guid lifeId)
-            : this(sourceArray)
+        public MonoLifeGrid()
         {
-            LifeId = lifeId;
         }
 
         /// <summary>
         /// Constructor for <see cref="MonoLifeGrid{TValue}"/>.
         /// </summary>
-        public MonoLifeGrid(TValue[,] sourceArray)
+        public MonoLifeGrid(TValue[][] sourceArray, Guid lifeId)
+        {
+            Initialize(sourceArray, lifeId);
+        }
+
+        /// <summary>
+        /// Constructor for <see cref="MonoLifeGrid{TValue}"/>.
+        /// </summary>
+        public MonoLifeGrid(TValue[,] sourceArray, Guid lifeId)
+        {
+            Initialize(sourceArray.ToJaggedArray(), lifeId);
+        }
+
+        private void Initialize(TValue[][] sourceArray, Guid lifeId)
         {
             if (sourceArray == null)
             {
                 throw new ArgumentNullException(nameof(sourceArray));
             }
 
-            _sourceArray = (TValue[,])sourceArray.Clone();
-            LifeId = Guid.NewGuid();
+            _sourceArray = sourceArray;
+            LifeId = lifeId;
         }
 
         /// <summary>
@@ -45,7 +63,7 @@ namespace Gol.Core.Controls.Models
         /// <summary>
         /// Grid height.
         /// </summary>
-        public int Height => _sourceArray.GetLength(1);
+        public int Height => _sourceArray[0].GetLength(0);
 
         /// <summary>
         /// Get point black state.
@@ -57,12 +75,12 @@ namespace Gol.Core.Controls.Models
         {
             get
             {
-                return _sourceArray[x, y];
+                return _sourceArray[x][y];
             }
 
             set
             {
-                _sourceArray[x, y] = value;
+                _sourceArray[x][y] = value;
             }
         }
 
@@ -72,8 +90,8 @@ namespace Gol.Core.Controls.Models
         /// <returns></returns>
         public MonoLifeGrid<TValue> Clone()
         {
-            var array = (TValue[,])_sourceArray.Clone();
-            return new MonoLifeGrid<TValue>(array) { LifeId = LifeId };
+            var array = (TValue[][])_sourceArray.Clone();
+            return new MonoLifeGrid<TValue>(array, LifeId);
         }
     }
 }

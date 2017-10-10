@@ -12,25 +12,39 @@
         Title="Game of life. Author: Sergey Vaulin. Site: www.devowl.net" Height="350" Width="525">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
-            <Setter Property="Margin" Value="5" />
+            <Setter Property="Margin" Value="3" />
             <Setter Property="MinWidth" Value="100" />
         </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+        <Menu>
+            <MenuItem Header="File" Command="">
+                <MenuItem Header="New" />
+                <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="SaveAs..." Command="{Binding SaveCommand}"/>
+                <Separator />
+                <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Life" Command="">
+                <MenuItem Header="Start" Command="{Binding StartCommand}" />
+                <MenuItem Header="Stop" Command="{Binding StopCommand}" />
+            </MenuItem>
+        </Menu>
+        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Grid.Row="1">
             <views:MonoLifeView MonoLifeGrid="{Binding DoubleStateLife.Current, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Background="Black" />
             <i:Interaction.Behaviors>
                 <behaviors:GridScrollViewerBehavior/>
             </i:Interaction.Behaviors>
         </ScrollViewer>
-        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal">
+        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Grid.Row="2">
             <Button Command="{Binding StartCommand}" Content="Start"/>
             <Button Command="{Binding StopCommand}" Content="Stop"/>
-            <TextBlock>
+            <TextBlock VerticalAlignment="Center" Margin="3,0">
                 Generation:
                 <Run Text="{Binding DoubleStateLife.GernerationNumber, FallbackValue=0}" />
             </TextBlock>
