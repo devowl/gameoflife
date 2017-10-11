@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 
 using Gol.Core.Controls.Models;
 
@@ -18,10 +19,10 @@ namespace Gol.Application.Utils
         public static void Save(Stream fileStream, object sourceObject)
         {
             var type = sourceObject.GetType();
-            var serializer = new DataContractSerializer(type);
+            var serializer = new DataContractJsonSerializer(type);
             serializer.WriteObject(fileStream, sourceObject);
         }
-
+        
         /// <summary>
         /// Read object from stream.
         /// </summary>
@@ -31,7 +32,7 @@ namespace Gol.Application.Utils
         public static TValue Read<TValue>(Stream fileStream)
         {
             var type = typeof(MonoLifeGrid<bool>);
-            var serializer = new DataContractSerializer(type);
+            var serializer = new DataContractJsonSerializer(type);
             return (TValue)serializer.ReadObject(fileStream);
         }
     }
