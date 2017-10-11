@@ -51,6 +51,19 @@ namespace Gol.Core.Controls.Models
                 throw new ArgumentException(nameof(lifeId));
             }
 
+            if (sourceArray == null)
+            {
+                throw new ArgumentNullException(nameof(sourceArray));
+            }
+
+            for (int i = 0; i < sourceArray.Length; i++)
+            {
+                if (sourceArray[i] == null)
+                {
+                    throw new ArgumentNullException($"sourceArray [{i}] is null");
+                }
+            }
+
             _sourceArray = sourceArray;
             LifeId = lifeId;
         }
@@ -58,6 +71,7 @@ namespace Gol.Core.Controls.Models
         /// <summary>
         /// Life field identity.
         /// </summary>
+        [DataMember]
         public Guid LifeId { get; private set; }
 
         /// <summary>
@@ -95,8 +109,15 @@ namespace Gol.Core.Controls.Models
         /// <returns></returns>
         public MonoLifeGrid<TValue> Clone()
         {
-            var array = (TValue[][])_sourceArray.Clone();
-            return new MonoLifeGrid<TValue>(array, LifeId);
+            var copy = new TValue[Width][];
+            for (int i = 0; i < Width; i++)
+            {
+                var second = new TValue[Height];
+                Array.Copy(_sourceArray[i], second, Height);
+                copy[i] = second;
+            }
+            
+            return new MonoLifeGrid<TValue>(copy, LifeId);
         }
     }
 }

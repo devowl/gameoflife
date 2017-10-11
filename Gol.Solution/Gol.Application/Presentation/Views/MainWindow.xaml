@@ -9,7 +9,7 @@
         xmlns:behaviors="clr-namespace:Gol.Application.Presentation.Behaviors"
         d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="Game of life. Author: Sergey Vaulin. Site: www.devowl.net" Height="350" Width="525">
+        Title="Game of life. Author: Sergey Vaulin. Site: www.devowl.net" Height="750" Width="1024">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="3" />
@@ -24,7 +24,7 @@
         </Grid.RowDefinitions>
         <Menu>
             <MenuItem Header="File" Command="">
-                <MenuItem Header="New" />
+                <MenuItem Header="New" Command="{Binding NewCommand}" />
                 <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
                 <MenuItem Header="SaveAs..." Command="{Binding SaveCommand}"/>
                 <Separator />

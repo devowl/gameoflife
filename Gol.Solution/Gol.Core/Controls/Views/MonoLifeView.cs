@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -175,12 +176,18 @@ namespace Gol.Core.Controls.Views
         private int _currentX = -1;
 
         private int _currentY = -1;
+
+        private bool _mouseMoving; 
         
         /// <inheritdoc/>
         protected override void OnMouseUp(MouseButtonEventArgs args)
         {
             base.OnMouseUp(args);
-            _currentY = _currentX = -1;
+            if (args.LeftButton == MouseButtonState.Released && !_mouseMoving && !IsReadOnly)
+            {
+                var cell = GetMouseCell(args);
+                ProcessMouseSelection(cell);
+            }
         }
 
         /// <inheritdoc/>
@@ -189,6 +196,7 @@ namespace Gol.Core.Controls.Views
             base.OnMouseMove(args);
             if (args.LeftButton == MouseButtonState.Pressed && !IsReadOnly)
             {
+                _mouseMoving = true;
                 var cell = GetMouseCell(args);
                 if (cell.X == _currentX && cell.Y == _currentY)
                 {
@@ -199,33 +207,30 @@ namespace Gol.Core.Controls.Views
                 _currentX = cell.X;
                 _currentY = cell.Y;
             }
-        }
 
-        /// <inheritdoc/>
-        protected override void OnMouseDown(MouseButtonEventArgs args)
-        {
-            base.OnMouseDown(args);
-
-            if (!IsReadOnly)
+            if (args.LeftButton == MouseButtonState.Released)
             {
-                var cell = GetMouseCell(args);
-                ProcessMouseSelection(cell);
+                _currentY = _currentX = -1;
+                _mouseMoving = false;
             }
         }
-        
+
         private void ProcessMouseSelection(IntPoint cell, bool isOnlyDraw = false)
         {
             if (0 <= cell.X && cell.X < MonoLifeGrid.Width && 0 <= cell.Y && cell.Y < MonoLifeGrid.Height)
             {
-                var value = !MonoLifeGrid[cell.X, cell.Y];
-                MonoLifeGrid[cell.X, cell.Y] = value;
-                if (value)
+                var current = MonoLifeGrid[cell.X, cell.Y];
+                MonoLifeGrid[cell.X, cell.Y] = !current;
+                if (current)
+                {
+                    if (!isOnlyDraw)
+                    {
+                        _cellGrid[cell.X, cell.Y].ClearRectangle();
+                    }
+                }
+                else
                 {
                     DrawSquare(cell.X, cell.Y);
-                }
-                else if (!isOnlyDraw)
-                {
-                    _cellGrid[cell.X, cell.Y].ClearRectangle();
                 }
             }
         }
@@ -385,7 +390,11 @@ namespace Gol.Core.Controls.Views
                 {
                     Rectangle = new Rectangle() { Fill = _parent.CellBrush, Width = _parent.CellSize, Height = _parent.CellSize };
                 }
-
+                else if (_canvas.Children.Contains(Rectangle))
+                {
+                    return;
+                }
+                
                 _canvas.Children.Add(Rectangle);
                 Canvas.SetLeft(Rectangle, X * _parent.CellSize);
                 Canvas.SetTop(Rectangle, Y * _parent.CellSize);
@@ -400,7 +409,7 @@ namespace Gol.Core.Controls.Views
                 {
                     throw new ArgumentException("Rectangle is not drawed here");
                 }
-
+                
                 _canvas.Children.Remove(Rectangle);
             }
 

@@ -15,7 +15,7 @@ namespace Gol.Core.Algorithm
     /// </summary>
     public class DoubleStateLife : NotificationObject, ILifeControl<bool>
     {
-        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(1000);
+        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(50);
 
         private Thread _updateTimer;
 
@@ -179,13 +179,13 @@ namespace Gol.Core.Algorithm
         private void LifeStep()
         {
             /*
-            * У каждой клетки 8 соседних клеток.
-            * В каждой клетке может жить существо.
-            * Существо с двумя или тремя соседями выживает в следующем поколении, иначе погибает от одиночества или перенаселённости.
-            * В пустой клетке с тремя соседями в следующем поколении рождается существо.
+            https://ru.wikipedia.org/wiki/%D0%96%D0%B8%D0%B7%D0%BD%D1%8C_(%D0%B8%D0%B3%D1%80%D0%B0)
+            - В пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
+            - Если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить; в противном случае, если соседей 
+              меньше двух или больше трёх, клетка умирает («от одиночества» или «от перенаселённости»)
             */
-            Previous = _current;
-            Current = _current.Clone();
+            _previous = _current;
+            _current = _current.Clone();
             for (int i = 0; i < _current.Width; i ++)
             {
                 for (int j = 0; j < _current.Height; j ++)
@@ -195,12 +195,12 @@ namespace Gol.Core.Algorithm
 
                     if (isCreature)
                     {
-                        // Существо с двумя или тремя соседями выживает в следующем поколении, иначе погибает от одиночества или перенаселённости.
+                        // Если у живой клетки есть две или три живые соседки, то эта клетка продолжает жить;
                         _current[i, j] = nearCells == 2 || nearCells == 3;
                     }
                     else
                     {
-                        // В пустой клетке с тремя соседями в следующем поколении рождается существо.
+                        // В пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
                         _current[i, j] = nearCells == 3;
                     }
 

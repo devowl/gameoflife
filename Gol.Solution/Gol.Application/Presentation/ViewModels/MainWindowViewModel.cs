@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Xml.Serialization;
 
 using Gol.Application.Presentation.Views;
+using Gol.Application.Utils;
 using Gol.Core.Algorithm;
 using Gol.Core.Controls.Models;
 using Gol.Core.Prism;
@@ -17,15 +17,11 @@ namespace Gol.Application.Presentation.ViewModels
     /// </summary>
     public class MainWindowViewModel : NotificationObject
     {
+        private const int DefaultFieldWidth = 250;
+
+        private const int DefaultFieldHeight = 150;
+
         private DoubleStateLife _doubleStateLife;
-
-        private const int DefaultFieldWidth = 5;
-
-        private const int DefaultFieldHeight = 3;
-
-        private const string ExamplesDirectoryName = "Examples";
-
-        private const string FilesFilter = "Life saves (*.life)|*.life|All files (*.*)|*.*";
 
         /// <summary>
         /// Constructor for <see cref="MainWindowViewModel"/>.
@@ -40,62 +36,7 @@ namespace Gol.Application.Presentation.ViewModels
             SaveCommand = new DelegateCommand(Save);
             ExitCommand = new DelegateCommand(Exit);
             OpenCommand = new DelegateCommand(Open);
-        }
-
-        private void Open(object obj)
-        {
-            var openDialog = new OpenFileDialog()
-            {
-                InitialDirectory = GetInitialDirectory(),
-                Filter = FilesFilter,
-                RestoreDirectory = true,
-                Multiselect = false,
-                
-            };
-            var dialogResult = openDialog.ShowDialog();
-            if (dialogResult.HasValue && dialogResult.Value)
-            {
-                using (var openFile = File.Open(openDialog.FileName, FileMode.Open))
-                {
-                    var type = typeof(MonoLifeGrid<bool>);
-                    var serializer = new DataContractSerializer(type);
-                    var grid = (MonoLifeGrid<bool>)serializer.ReadObject(openFile);
-                    DoubleStateLife = new DoubleStateLife(grid);
-                }
-            }
-        }
-
-        private string GetInitialDirectory()
-        {
-            var initialDirectory = Environment.CurrentDirectory;
-            var examplePath = Path.Combine(Environment.CurrentDirectory, ExamplesDirectoryName);
-            if (Directory.Exists(examplePath))
-            {
-                initialDirectory = examplePath;
-            }
-
-            return initialDirectory;
-        }
-
-        private void Save(object obj)
-        {
-            var saveDialog = new SaveFileDialog()
-            {
-                InitialDirectory = GetInitialDirectory(),
-                Filter = FilesFilter,
-                RestoreDirectory = true
-            };
-
-            var dialogResult = saveDialog.ShowDialog();
-            if (dialogResult.HasValue && dialogResult.Value)
-            {
-                using (var saveFile = saveDialog.OpenFile())
-                {
-                    var type = typeof(MonoLifeGrid<bool>);
-                    var serializer = new DataContractSerializer(type);
-                    serializer.WriteObject(saveFile, DoubleStateLife.Current);
-                }
-            }
+            NewCommand = new DelegateCommand(New);
         }
 
         /// <summary>
@@ -121,6 +62,11 @@ namespace Gol.Application.Presentation.ViewModels
         public DelegateCommand ExitCommand { get; private set; }
 
         /// <summary>
+        /// New command.
+        /// </summary>
+        public DelegateCommand NewCommand { get; private set; }
+
+        /// <summary>
         /// Start command.
         /// </summary>
         public DelegateCommand StartCommand { get; private set; }
@@ -134,11 +80,36 @@ namespace Gol.Application.Presentation.ViewModels
         /// Save command.
         /// </summary>
         public DelegateCommand SaveCommand { get; private set; }
-        
+
         /// <summary>
         /// Stop command.
         /// </summary>
         public DelegateCommand StopCommand { get; private set; }
+
+        private void Open(object obj)
+        {
+            Stream fileStream;
+            if (FileUtils.TryGetOpenFile(out fileStream))
+            {
+                using (fileStream)
+                {
+                    var grid = SerializationUtils.Read<MonoLifeGrid<bool>>(fileStream);
+                    DoubleStateLife = new DoubleStateLife(grid);
+                }
+            }
+        }
+
+        private void Save(object obj)
+        {
+            Stream fileStream;
+            if (FileUtils.TryGetSaveFile(out fileStream))
+            {
+                using (fileStream)
+                {
+                    SerializationUtils.Save(fileStream, DoubleStateLife.Current);
+                }
+            }
+        }
 
         private void Exit(object obj)
         {
@@ -153,6 +124,12 @@ namespace Gol.Application.Presentation.ViewModels
         private void Start(object obj)
         {
             DoubleStateLife.Start();
+        }
+
+        private void New(object obj)
+        {
+            var grid = new MonoLifeGrid<bool>(new bool[DefaultFieldWidth, DefaultFieldHeight], Guid.NewGuid());
+            DoubleStateLife = new DoubleStateLife(grid);
         }
     }
 }
