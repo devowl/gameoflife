@@ -15,9 +15,11 @@ namespace Gol.Core.Algorithm
     /// </summary>
     public class DoubleStateLife : NotificationObject, ILifeControl<bool>
     {
-        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(10);
+        private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(1000);
 
-        private Timer _updateTimer;
+        private Thread _updateTimer;
+
+        private bool _stopUpdateTimer;
 
         //    -1   0   1
         // -1 [ ] [ ] [ ]
@@ -136,19 +138,26 @@ namespace Gol.Core.Algorithm
                 Stop();
             }
 
-            _updateTimer = new Timer(TimerElapsed, null, TimeSpan.FromSeconds(0), _realtimeDelay);
+            _stopUpdateTimer = false;
+            _updateTimer = new Thread(TimerElapsed);
+            _updateTimer.Start();
         }
 
         /// <inheritdoc/>
         public void Stop()
         {
-            _updateTimer.Dispose();
+            _stopUpdateTimer = true;
+            _updateTimer.Join();
+            _updateTimer = null;
         }
 
         private void TimerElapsed(object obj)
         {
-            LifeStep();
-            Thread.Sleep(_realtimeDelay);
+            while (!_stopUpdateTimer)
+            {
+                LifeStep();
+                Thread.Sleep(_realtimeDelay);
+            }
         }
 
         private int NearCells(int x, int y, MonoLifeGrid<bool> field)

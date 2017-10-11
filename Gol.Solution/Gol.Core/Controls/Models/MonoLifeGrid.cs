@@ -46,6 +46,11 @@ namespace Gol.Core.Controls.Models
                 throw new ArgumentNullException(nameof(sourceArray));
             }
 
+            if (lifeId == Guid.Empty)
+            {
+                throw new ArgumentException(nameof(lifeId));
+            }
+
             _sourceArray = sourceArray;
             LifeId = lifeId;
         }

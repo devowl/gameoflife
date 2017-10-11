@@ -19,9 +19,9 @@ namespace Gol.Application.Presentation.ViewModels
     {
         private DoubleStateLife _doubleStateLife;
 
-        private const int DefaultFieldWidth = 250;
+        private const int DefaultFieldWidth = 5;
 
-        private const int DefaultFieldHeight = 200;
+        private const int DefaultFieldHeight = 3;
 
         private const string ExamplesDirectoryName = "Examples";
 

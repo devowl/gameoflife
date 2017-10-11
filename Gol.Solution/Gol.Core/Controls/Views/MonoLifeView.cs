@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -211,7 +212,7 @@ namespace Gol.Core.Controls.Views
                 ProcessMouseSelection(cell);
             }
         }
-
+        
         private void ProcessMouseSelection(IntPoint cell, bool isOnlyDraw = false)
         {
             if (0 <= cell.X && cell.X < MonoLifeGrid.Width && 0 <= cell.Y && cell.Y < MonoLifeGrid.Height)
@@ -292,25 +293,25 @@ namespace Gol.Core.Controls.Views
                 Height = MonoLifeGrid.Height * CellSize;
             }
             
-            for (int i = 0; i < MonoLifeGrid.Height; i++)
+            for (int i = 0; i < MonoLifeGrid.Width; i++)
             {
-                for (int j = 0; j < MonoLifeGrid.Width; j++)
+                for (int j = 0; j < MonoLifeGrid.Height; j++)
                 {
                     CellData cell;
                     if (isNewGrid)
                     {
-                        _cellGrid[j, i] = cell = new CellData(j, i, CanvasRef);
+                        _cellGrid[i, j] = cell = new CellData(i, j, CanvasRef, this);
                     }
                     else
                     {
-                        cell = _cellGrid[j, i];
+                        cell = _cellGrid[i, j];
                     }
                     
-                    if (MonoLifeGrid[j, i] && !cell.IsBlack)
+                    if (MonoLifeGrid[i, j] && !cell.IsBlack)
                     {
-                        DrawSquare(j, i);
+                        DrawSquare(i, j);
                     }
-                    else if(!MonoLifeGrid[j, i] && cell.IsBlack)
+                    else if(!MonoLifeGrid[i, j] && cell.IsBlack)
                     {
                         cell.ClearRectangle();
                     }
@@ -320,13 +321,7 @@ namespace Gol.Core.Controls.Views
 
         private void DrawSquare(int x, int y)
         {
-            var square = new Rectangle() { Fill = CellBrush, Width = CellSize, Height = CellSize };
-
-            CanvasRef.Children.Add(square);
-            Canvas.SetLeft(square, x * CellSize);
-            Canvas.SetTop(square, y * CellSize);
-
-            _cellGrid[x, y].SetRectangle(square);
+            _cellGrid[x, y].DrawRectangle();
         }
 
         private void SquareGrid()
@@ -353,12 +348,15 @@ namespace Gol.Core.Controls.Views
         {
             private readonly Canvas _canvas;
 
+            private readonly MonoLifeView _parent;
+
             /// <summary>
             /// Constructor for <see cref="CellData"/>.
             /// </summary>
-            public CellData(int x, int y, Canvas canvas)
+            public CellData(int x, int y, Canvas canvas, MonoLifeView parent)
             {
                 _canvas = canvas;
+                _parent = parent;
                 X = x;
                 Y = y;
             }
@@ -381,15 +379,16 @@ namespace Gol.Core.Controls.Views
             /// <summary>
             /// Set rectangle value.
             /// </summary>
-            /// <param name="rectangle"><see cref="Rectangle"/> instance.</param>
-            public void SetRectangle(Rectangle rectangle)
+            public void DrawRectangle()
             {
-                if (Rectangle != null)
+                if (Rectangle == null)
                 {
-                    _canvas.Children.Remove(Rectangle);
+                    Rectangle = new Rectangle() { Fill = _parent.CellBrush, Width = _parent.CellSize, Height = _parent.CellSize };
                 }
 
-                Rectangle = rectangle;
+                _canvas.Children.Add(Rectangle);
+                Canvas.SetLeft(Rectangle, X * _parent.CellSize);
+                Canvas.SetTop(Rectangle, Y * _parent.CellSize);
             }
 
             /// <summary>
@@ -397,10 +396,12 @@ namespace Gol.Core.Controls.Views
             /// </summary>
             public void ClearRectangle()
             {
-                if (Rectangle != null)
+                if (Rectangle == null)
                 {
-                    _canvas.Children.Remove(Rectangle);
+                    throw new ArgumentException("Rectangle is not drawed here");
                 }
+
+                _canvas.Children.Remove(Rectangle);
             }
 
             /// <summary>
