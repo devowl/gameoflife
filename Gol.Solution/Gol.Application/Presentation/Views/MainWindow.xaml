@@ -23,17 +23,18 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Menu>
-            <MenuItem Header="File" Command="">
+            <MenuItem Header="File">
                 <MenuItem Header="New" Command="{Binding NewCommand}" />
                 <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
                 <MenuItem Header="SaveAs..." Command="{Binding SaveCommand}"/>
                 <Separator />
                 <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
             </MenuItem>
-            <MenuItem Header="Life" Command="">
+            <MenuItem Header="Life">
                 <MenuItem Header="Start" Command="{Binding StartCommand}" />
                 <MenuItem Header="Stop" Command="{Binding StopCommand}" />
             </MenuItem>
+            <MenuItem Header="About" Command="{Binding AboutCommand}"/> 
         </Menu>
         <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Grid.Row="1">
             <views:MonoLifeView MonoLifeGrid="{Binding DoubleStateLife.Current, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Background="Black" />

@@ -1,14 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization;
 
 using Gol.Application.Presentation.Views;
 using Gol.Application.Utils;
 using Gol.Core.Algorithm;
 using Gol.Core.Controls.Models;
 using Gol.Core.Prism;
-
-using Microsoft.Win32;
 
 namespace Gol.Application.Presentation.ViewModels
 {
@@ -37,6 +34,7 @@ namespace Gol.Application.Presentation.ViewModels
             ExitCommand = new DelegateCommand(Exit);
             OpenCommand = new DelegateCommand(Open);
             NewCommand = new DelegateCommand(New);
+            AboutCommand = new DelegateCommand(About);
         }
 
         /// <summary>
@@ -55,6 +53,11 @@ namespace Gol.Application.Presentation.ViewModels
                 RaisePropertyChanged(() => DoubleStateLife);
             }
         }
+
+        /// <summary>
+        /// About command.
+        /// </summary>
+        public DelegateCommand AboutCommand { get; private set; }
 
         /// <summary>
         /// Exit command.
@@ -85,6 +88,12 @@ namespace Gol.Application.Presentation.ViewModels
         /// Stop command.
         /// </summary>
         public DelegateCommand StopCommand { get; private set; }
+
+        private void About(object obj)
+        {
+            var aboutWindow = new AboutWindow { Owner = System.Windows.Application.Current.MainWindow };
+            aboutWindow.ShowDialog();
+        }
 
         private void Open(object obj)
         {

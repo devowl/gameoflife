@@ -1,8 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows;
 
 using Gol.Core.Controls.Models;
 using Gol.Core.Data;
@@ -17,16 +17,11 @@ namespace Gol.Core.Algorithm
     {
         private readonly TimeSpan _realtimeDelay = TimeSpan.FromMilliseconds(50);
 
-        private Thread _updateTimer;
-
-        private bool _stopUpdateTimer;
-
         //    -1   0   1
         // -1 [ ] [ ] [ ]
         //  0 [ ] [X] [ ]
         //  1 [ ] [ ] [ ]
         private readonly Offset[] _offsets = {
-
             // Line 1
             new Offset(-1, -1),
             new Offset(0, -1),
@@ -42,6 +37,10 @@ namespace Gol.Core.Algorithm
             new Offset(1, 1),
         };
 
+        private Thread _updateTimer;
+
+        private bool _stopUpdateTimer;
+
         private MonoLifeGrid<bool> _current;
 
         private MonoLifeGrid<bool> _previous;
@@ -51,8 +50,7 @@ namespace Gol.Core.Algorithm
         /// <summary>
         /// Constructor for <see cref="DoubleStateLife"/>.
         /// </summary>
-        public DoubleStateLife(MonoLifeGrid<bool> current) 
-            : this()
+        public DoubleStateLife(MonoLifeGrid<bool> current) : this()
         {
             SetCurrent(current);
         }
@@ -62,6 +60,14 @@ namespace Gol.Core.Algorithm
         /// </summary>
         public DoubleStateLife()
         {
+            Application.Current.Exit += (sender, args) =>
+                                        {
+                                            if (_updateTimer != null)
+                                            {
+                                                _stopUpdateTimer = true;
+                                                _updateTimer.Abort();
+                                            }
+                                        };
         }
 
         /// <inheritdoc/>
@@ -151,6 +157,16 @@ namespace Gol.Core.Algorithm
             _updateTimer = null;
         }
 
+        private static int IsBlack(int x, int y, MonoLifeGrid<bool> field)
+        {
+            if ((0 <= x && x < field.Width) && (0 <= y && y < field.Height))
+            {
+                return field[x, y] ? 1 : 0;
+            }
+
+            return 0;
+        }
+
         private void TimerElapsed(object obj)
         {
             while (!_stopUpdateTimer)
@@ -163,16 +179,6 @@ namespace Gol.Core.Algorithm
         private int NearCells(int x, int y, MonoLifeGrid<bool> field)
         {
             return _offsets.Sum(offset => IsBlack(x + offset.Dx, y + offset.Dy, field));
-        }
-
-        private static int IsBlack(int x, int y, MonoLifeGrid<bool> field)
-        {
-            if ((0 <= x && x < field.Width) && (0 <= y && y < field.Height))
-            {
-                return field[x, y] ? 1 : 0;
-            }
-
-            return 0;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
@@ -203,7 +209,6 @@ namespace Gol.Core.Algorithm
                         // В пустой (мёртвой) клетке, рядом с которой ровно три живые клетки, зарождается жизнь;
                         _current[i, j] = nearCells == 3;
                     }
-
                 }
             }
 
