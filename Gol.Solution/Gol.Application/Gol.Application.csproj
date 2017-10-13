@@ -110,12 +110,18 @@
     <None Include="Examples\Cross.life">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Examples\Fishs.life" />
+    <None Include="Examples\Fishs.life">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Examples\Glider_Gun1.life">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Examples\ping-pong.life" />
-    <None Include="Examples\Ship.life" />
+    <None Include="Examples\ping-pong.life">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Examples\Ship.life">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
